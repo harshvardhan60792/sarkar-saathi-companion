@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +12,8 @@ const AuthPage = () => {
   const { tr } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
   const { toast } = useToast();
 
   const [isSignUp, setIsSignUp] = useState(false);
@@ -25,8 +27,8 @@ const AuthPage = () => {
   });
 
   useEffect(() => {
-    if (user) navigate("/", { replace: true });
-  }, [user, navigate]);
+    if (user) navigate(redirectTo, { replace: true });
+  }, [user, navigate, redirectTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +58,7 @@ const AuthPage = () => {
           password: form.password,
         });
         if (error) throw error;
-        navigate("/");
+        navigate(redirectTo);
       }
     } catch (error: any) {
       toast({
