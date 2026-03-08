@@ -217,12 +217,15 @@ const FormFiller = ({
     scheme: Scheme; onDone: () => void; speak: (t: string) => void; lang: string
 }) => {
     const isHi = lang === "hi";
+    const { user } = useAuth();
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [currentIdx, setCurrentIdx] = useState(0);
     const [messages, setMessages] = useState<{ from: "bot" | "user"; text: string }[]>([]);
     const [typing, setTyping] = useState(false);
     const [inputVal, setInputVal] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [applied, setApplied] = useState(false);
+    const [applying, setApplying] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
     const IconComp = (Icons as any)[scheme.icon] || Icons.FileText;
     const grad = catColors[scheme.category] || "from-gray-500 to-slate-600";
