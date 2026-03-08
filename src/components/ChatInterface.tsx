@@ -72,7 +72,7 @@ const ChatInterface = () => {
           "apikey": supabaseKey,
           "Authorization": `Bearer ${supabaseKey}`,
         },
-        body: JSON.stringify({ messages: newMessages, mode: "general" }),
+        body: JSON.stringify({ messages: newMessages, mode: "general", language: lang }),
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
