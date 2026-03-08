@@ -4,7 +4,7 @@ import LanguageSelector from "./LanguageSelector";
 import ReactMarkdown from "react-markdown";
 import { Send, Bot, User, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useWebSpeech } from "@/hooks/useWebSpeech";
+import { useElevenLabsVoice } from "@/hooks/useElevenLabsVoice";
 
 interface Message {
   role: "assistant" | "user";
@@ -41,17 +41,13 @@ const ChatInterface = () => {
   const [inputVal, setInputVal] = useState("");
   const [streaming, setStreaming] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening } = useWebSpeech();
+  const { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening } = useElevenLabsVoice(lang);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streaming]);
 
-  // Load voices on mount (needed for some browsers)
-  useEffect(() => {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-  }, []);
+  // ElevenLabs handles voice loading automatically
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || streaming) return;
