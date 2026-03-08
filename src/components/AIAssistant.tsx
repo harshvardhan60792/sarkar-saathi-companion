@@ -453,7 +453,25 @@ const AIAssistant = () => {
     const { lang } = useLanguage();
     const isHi = lang === "hi";
     const navigate = useNavigate();
-    const { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening } = useElevenLabsVoice();
+    const { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening } = useWebSpeech();
+    const speakQueueRef = useRef<string[]>([]);
+    const isSpeakingQueueRef = useRef(false);
+
+    const speakSequentially = useCallback(async (texts: string[]) => {
+      speakQueueRef.current = [...speakQueueRef.current, ...texts];
+      if (isSpeakingQueueRef.current) return;
+      isSpeakingQueueRef.current = true;
+      while (speakQueueRef.current.length > 0) {
+        const t = speakQueueRef.current.shift()!;
+        speak(t);
+        await new Promise<void>((resolve) => {
+          const check = setInterval(() => {
+            if (!window.speechSynthesis.speaking) { clearInterval(check); resolve(); }
+          }, 200);
+        });
+      }
+      isSpeakingQueueRef.current = false;
+    }, [speak]);
 
     const [phase, setPhase] = useState<Phase>("profile");
     const [messages, setMessages] = useState<Message[]>([]);
