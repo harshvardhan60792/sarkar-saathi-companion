@@ -35,7 +35,7 @@ const MessageSpeakerButton = ({ text, speakFn, stopFn, isSpeaking }: { text: str
 
 const ChatInterface = () => {
   const { lang } = useLanguage();
-  const isHi = lang === "hi";
+  const tl = (m: Record<string, string>) => m[lang] || m["en"];
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState("");
@@ -110,7 +110,7 @@ const ChatInterface = () => {
       console.error("Chat error:", e);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: isHi ? "माफ़ करें, कोई त्रुटि हुई। कृपया पुनः प्रयास करें।" : "Sorry, something went wrong. Please try again." },
+        { role: "assistant", content: tl({ en: "Sorry, something went wrong. Please try again.", hi: "माफ़ करें, कोई त्रुटि हुई। कृपया पुनः प्रयास करें।", ta: "மன்னிக்கவும், தவறு ஏற்பட்டது.", mr: "क्षमस्व, चूक झाली.", te: "క్షమించండి, తప్పు జరిగింది." }) },
       ]);
     } finally {
       setStreaming(false);
@@ -181,20 +181,18 @@ const ChatInterface = () => {
                 </div>
                 <div>
                   <h3 className="font-['Space_Grotesk'] font-bold text-white text-lg mb-1">
-                    {isHi ? "सरकार साथी AI से पूछें" : "Ask Sarkar Saathi AI"}
+                    {tl({ en: "Ask Sarkar Saathi AI", hi: "सरकार साथी AI से पूछें", ta: "சர்கார் சாதி AI-யிடம் கேளுங்கள்", mr: "सरकार साथी AI ला विचारा", te: "సర్కార్ సాథీ AI ని అడగండి" })}
                   </h3>
                   <p className="text-sm text-muted-foreground max-w-md">
-                    {isHi
-                      ? "सरकारी योजनाओं, पात्रता, दस्तावेज़ों, या ऐप के बारे में कुछ भी पूछें।"
-                      : "Ask anything about government schemes, eligibility, documents, or how to use this app."}
+                    {tl({ en: "Ask anything about government schemes, eligibility, documents, or how to use this app.", hi: "सरकारी योजनाओं, पात्रता, दस्तावेज़ों, या ऐप के बारे में कुछ भी पूछें।", ta: "அரசு திட்டங்கள், தகுதி, ஆவணங்கள் பற்றி கேளுங்கள்.", mr: "सरकारी योजना, पात्रता, कागदपत्रांबद्दल काहीही विचारा.", te: "ప్రభుత్వ పథకాలు, అర్హత, పత్రాల గురించి ఏదైనా అడగండి." })}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center mt-2">
                   {[
-                    isHi ? "PM-KISAN क्या है?" : "What is PM-KISAN?",
-                    isHi ? "आवास योजना की पात्रता?" : "Eligibility for PM Awas?",
-                    isHi ? "छात्रवृत्ति कैसे मिलेगी?" : "How to get scholarships?",
-                    isHi ? "डैशबोर्ड कैसे देखें?" : "How to use the dashboard?",
+                    tl({ en: "What is PM-KISAN?", hi: "PM-KISAN क्या है?", ta: "PM-KISAN என்றால் என்ன?", mr: "PM-KISAN म्हणजे काय?", te: "PM-KISAN అంటే ఏమిటి?" }),
+                    tl({ en: "Eligibility for PM Awas?", hi: "आवास योजना की पात्रता?", ta: "PM Awas தகுதி?", mr: "PM आवास पात्रता?", te: "PM Awas అర్హత?" }),
+                    tl({ en: "How to get scholarships?", hi: "छात्रवृत्ति कैसे मिलेगी?", ta: "உதவித்தொகை எப்படி?", mr: "शिष्यवृत्ती कशी मिळवायची?", te: "స్కాలర్‌షిప్ ఎలా పొందాలి?" }),
+                    tl({ en: "How to use the dashboard?", hi: "डैशबोर्ड कैसे देखें?", ta: "டாஷ்போர்டு எப்படி?", mr: "डॅशबोर्ड कसे वापरायचे?", te: "డ్యాష్‌బోర్డ్ ఎలా వాడాలి?" }),
                   ].map((q) => (
                     <button
                       key={q}
@@ -291,7 +289,7 @@ const ChatInterface = () => {
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage(inputVal)}
-                placeholder={isHi ? "योजनाओं के बारे में कुछ भी पूछें..." : "Ask anything about schemes..."}
+                placeholder={tl({ en: "Ask anything about schemes...", hi: "योजनाओं के बारे में कुछ भी पूछें...", ta: "திட்டங்கள் பற்றி கேளுங்கள்...", mr: "योजनांबद्दल काहीही विचारा...", te: "పథకాల గురించి ఏదైనా అడగండి..." })}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-[hsl(220_20%_8%)] border border-glass text-white placeholder:text-muted-foreground/50 text-sm focus:outline-none focus:border-[hsl(28_100%_54%/0.5)] transition-all"
               />
               <button
@@ -311,7 +309,7 @@ const ChatInterface = () => {
           transition={{ delay: 1 }}
           className="text-center text-xs text-muted-foreground mt-3"
         >
-          🎙️ {isHi ? "माइक बटन दबाकर बोलें — हिंदी, तमिल, तेलुगु, मराठी में भी" : "Hold mic button to speak in Hindi, Tamil, Telugu, Marathi & more"}
+          🎙️ {tl({ en: "Hold mic button to speak in Hindi, Tamil, Telugu, Marathi & more", hi: "माइक बटन दबाकर बोलें — हिंदी, तमिल, तेलुगु, मराठी में भी", ta: "மைக் பொத்தானை அழுத்திப் பிடித்து பேசுங்கள்", mr: "माइक बटन दाबून बोला", te: "మైక్ బటన్ నొక్కి మాట్లాడండి" })}
         </motion.p>
       </div>
     </div>
