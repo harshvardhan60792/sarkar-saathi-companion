@@ -58,7 +58,7 @@ const AuthPage = () => {
           password: form.password,
         });
         if (error) throw error;
-        navigate("/");
+        navigate(redirectTo);
       }
     } catch (error: any) {
       toast({
