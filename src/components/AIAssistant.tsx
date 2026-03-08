@@ -179,61 +179,7 @@ const TypingIndicator = () => (
     </div>
 );
 
-// ─── useVoice hook ────────────────────────────────────────────────────────────
-function useVoice(lang: string) {
-    const [listening, setListening] = useState(false);
-    const [speaking, setSpeaking] = useState(false);
-    const [voiceEnabled, setVoiceEnabled] = useState(true);
-    const recognitionRef = useRef<any>(null);
-    const synthRef = useRef(window.speechSynthesis);
-
-    const langMap: Record<string, string> = {
-        en: "en-IN", hi: "hi-IN", ta: "ta-IN", mr: "mr-IN", te: "te-IN",
-    };
-
-    const speak = useCallback((text: string) => {
-        if (!voiceEnabled) return;
-        synthRef.current.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = langMap[lang] || "en-IN";
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
-        utterance.onstart = () => setSpeaking(true);
-        utterance.onend = () => setSpeaking(false);
-        utterance.onerror = () => setSpeaking(false);
-        synthRef.current.speak(utterance);
-    }, [voiceEnabled, lang]);
-
-    const stopSpeaking = useCallback(() => {
-        synthRef.current.cancel();
-        setSpeaking(false);
-    }, []);
-
-    const startListening = useCallback((onResult: (text: string) => void) => {
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        if (!SpeechRecognition) return;
-        const recognition = new SpeechRecognition();
-        recognition.lang = langMap[lang] || "en-IN";
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.onresult = (e: any) => {
-            const transcript = e.results[0][0].transcript;
-            onResult(transcript);
-        };
-        recognition.onend = () => setListening(false);
-        recognition.onerror = () => setListening(false);
-        recognitionRef.current = recognition;
-        recognition.start();
-        setListening(true);
-    }, [lang]);
-
-    const stopListening = useCallback(() => {
-        recognitionRef.current?.stop();
-        setListening(false);
-    }, []);
-
-    return { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening };
-}
+// useVoice hook removed — now using useElevenLabsVoice from hooks
 
 // ─── SchemeCard (inside assistant) ───────────────────────────────────────────
 const SchemeResultCard = ({
