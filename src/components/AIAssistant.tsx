@@ -485,12 +485,12 @@ const AIAssistant = () => {
 
     const uid = () => Math.random().toString(36).slice(2);
 
-    const addBotMsg = (text: string, type: Message["type"] = "text", meta?: any) => {
+    const addBotMsg = (text: string, type: Message["type"] = "text", meta?: any, shouldSpeak = true) => {
         setTyping(true);
         setTimeout(() => {
             setMessages(p => [...p, { id: uid(), from: "bot", text, type, meta }]);
             setTyping(false);
-            speak(text);
+            if (shouldSpeak && voiceEnabled) speakSequentially([text]);
         }, 900);
     };
 
@@ -502,13 +502,19 @@ const AIAssistant = () => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, typing]);
 
-    // Start profile collection
+    // Start profile collection — speak welcome then question sequentially
     useEffect(() => {
         const welcome = isHi
             ? "🙏 नमस्ते! मैं सरकार साथी AI हूँ। मैं आपको सही सरकारी योजनाएँ खोजने में मदद करूँगा।"
             : "🙏 Namaste! I'm Sarkar Saathi AI. I'll help you find the right government schemes for you.";
-        addBotMsg(welcome);
-        setTimeout(() => askProfileQuestion(0), 1800);
+        addBotMsg(welcome, "text", undefined, false);
+        setTimeout(() => {
+            const step = profileSteps[0];
+            const q = isHi ? step.questionHi : step.question;
+            addBotMsg(q, step.type === "chips" ? "chips" : "text", step.chips, false);
+            // Speak both sequentially after both appear
+            if (voiceEnabled) speakSequentially([welcome, q]);
+        }, 1800);
     }, []);
 
     const askProfileQuestion = (idx: number) => {
