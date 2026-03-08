@@ -129,9 +129,22 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, mode } = await req.json();
+    const { messages, mode, language } = await req.json();
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const langMap: Record<string, string> = {
+      en: "English",
+      hi: "Hindi (हिन्दी)",
+      ta: "Tamil (தமிழ்)",
+      mr: "Marathi (मराठी)",
+      te: "Telugu (తెలుగు)",
+    };
+    const langName = langMap[language] || "English";
 
     let systemContent = SYSTEM_PROMPT;
+    systemContent += `\n\n## LANGUAGE INSTRUCTION\nThe user has selected "${langName}" as their preferred language. You MUST respond in ${langName}. Use the script native to that language (e.g., Devanagari for Hindi, Tamil script for Tamil, Telugu script for Telugu, Devanagari for Marathi). If the user writes in a different language, still respond in ${langName}.`;
+
     if (mode === "general") {
       systemContent += `\n\n## CURRENT MODE: GENERAL ASSISTANT
 You are in open chat mode. The user is on the AI Assistant page.
