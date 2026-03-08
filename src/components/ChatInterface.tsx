@@ -309,7 +309,7 @@ const ChatInterface = () => {
           transition={{ delay: 1 }}
           className="text-center text-xs text-muted-foreground mt-3"
         >
-          🎙️ {isHi ? "माइक बटन दबाकर बोलें — हिंदी, तमिल, तेलुगु, मराठी में भी" : "Hold mic button to speak in Hindi, Tamil, Telugu, Marathi & more"}
+          🎙️ {tl({ en: "Hold mic button to speak in Hindi, Tamil, Telugu, Marathi & more", hi: "माइक बटन दबाकर बोलें — हिंदी, तमिल, तेलुगु, मराठी में भी", ta: "மைக் பொத்தானை அழுத்திப் பிடித்து பேசுங்கள்", mr: "माइक बटन दाबून बोला", te: "మైక్ బటన్ నొక్కి మాట్లాడండి" })}
         </motion.p>
       </div>
     </div>
