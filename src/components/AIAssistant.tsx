@@ -758,6 +758,15 @@ Keep responses brief, polite, and directly address the user's profile and matche
                                                         </div>
                                                     </div>
                                                 )}
+                                                {msg.from === "bot" && msg.text && (
+                                                    <button
+                                                        onClick={() => speaking ? stopSpeaking() : speakSequentially([msg.text])}
+                                                        className="inline-flex items-center justify-center w-6 h-6 rounded-full glass border border-glass text-muted-foreground hover:text-[hsl(28,100%,64%)] transition-all mt-1"
+                                                        title={speaking ? "Stop" : "Play aloud"}
+                                                    >
+                                                        {speaking ? <VolumeX className="h-3 w-3" /> : <Volume2 className="h-3 w-3" />}
+                                                    </button>
+                                                )}
                                             </div>
                                             {msg.from === "user" && (
                                                 <div className="w-8 h-8 rounded-full glass border border-glass flex items-center justify-center shrink-0 mt-0.5">
