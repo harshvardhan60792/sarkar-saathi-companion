@@ -453,7 +453,7 @@ const AIAssistant = () => {
     const { lang } = useLanguage();
     const isHi = lang === "hi";
     const navigate = useNavigate();
-    const { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening } = useWebSpeech();
+    const { listening, speaking, voiceEnabled, setVoiceEnabled, speak, stopSpeaking, startListening, stopListening } = useElevenLabsVoice(lang);
     const speakQueueRef = useRef<string[]>([]);
     const isSpeakingQueueRef = useRef(false);
 

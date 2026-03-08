@@ -3,7 +3,26 @@ import { useState, useRef, useCallback } from "react";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-export function useElevenLabsVoice() {
+// Map app language codes to ElevenLabs/ISO 639 language codes
+const langToSttCode: Record<string, string> = {
+  en: "eng",
+  hi: "hin",
+  ta: "tam",
+  mr: "mar",
+  te: "tel",
+};
+
+function cleanTextForTTS(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, "") // remove code blocks
+    .replace(/[#*_~`>]/g, "")       // remove markdown symbols
+    .replace(/\[.*?\]\(.*?\)/g, "") // remove links
+    .replace(/\n{2,}/g, ". ")       // double newlines to pause
+    .replace(/\n/g, " ")            // single newlines to space
+    .trim();
+}
+
+export function useElevenLabsVoice(language: string = "en") {
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
@@ -12,13 +31,16 @@ export function useElevenLabsVoice() {
   const chunksRef = useRef<Blob[]>([]);
 
   const speak = useCallback(async (text: string) => {
-    if (!voiceEnabled || !text.trim()) return;
+    if (!text.trim()) return;
 
     // Stop any current playback
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
+
+    const cleaned = cleanTextForTTS(text);
+    if (!cleaned) return;
 
     setSpeaking(true);
     try {
@@ -29,7 +51,7 @@ export function useElevenLabsVoice() {
           apikey: SUPABASE_KEY,
           Authorization: `Bearer ${SUPABASE_KEY}`,
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: cleaned }),
       });
 
       if (!response.ok) throw new Error(`TTS failed: ${response.status}`);
@@ -55,7 +77,7 @@ export function useElevenLabsVoice() {
       console.error("ElevenLabs TTS error:", e);
       setSpeaking(false);
     }
-  }, [voiceEnabled]);
+  }, []);
 
   const stopSpeaking = useCallback(() => {
     if (audioRef.current) {
@@ -109,6 +131,9 @@ export function useElevenLabsVoice() {
         try {
           const formData = new FormData();
           formData.append("audio", audioBlob, "recording.webm");
+          // Pass language hint for better STT accuracy
+          const sttLang = langToSttCode[language] || "eng";
+          formData.append("language", sttLang);
 
           const response = await fetch(`${SUPABASE_URL}/functions/v1/elevenlabs-stt`, {
             method: "POST",
@@ -131,7 +156,7 @@ export function useElevenLabsVoice() {
 
       recorder.stop();
     });
-  }, []);
+  }, [language]);
 
   return {
     speaking,
